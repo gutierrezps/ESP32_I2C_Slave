@@ -29,6 +29,8 @@ void loop()
     Wire.write(0);
     Wire.endTransmission();
 
+    // slave response time, depends on what else the slave is doing
+    // inside its loop() function
     delay(20);
 
     Wire.requestFrom(I2C_SLAVE_ADDR, 6);    // request 6 bytes from slave device

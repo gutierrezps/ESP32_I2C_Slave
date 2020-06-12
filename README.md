@@ -71,10 +71,16 @@ That is why a master reading **must** be preceded by a write, as shown in
 example `master_reader`. **CAVEAT**: the slave may not have finished to write
 into the output buffer when the master requests data.
 
-## Status of official support for I2C Slave
+After setup, `update()` must be called periodically inside `loop()`. It's
+the `update()` function that will read the input buffer and trigger
+the other actions. Therefore, the slave response time is directly related
+to the other things being done inside `loop()` (see `master_reader` example).
+
+## Official I2C slave support
 
 Here are some links to follow the status of official support for I2C slave on
-ESP32. As soon as it's available, this library will no longer be needed.
+ESP32. As soon as it's available and well documented, this library will no
+longer be needed.
 
 * Issue #118 on arduino-esp32: [I2C Slave not implemented][1]
 * Issue #2202 on esp-idf: [I2C slave driver problems (IDFGH-297)][3]
