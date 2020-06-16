@@ -1,3 +1,33 @@
+/**
+ * @file WireUnpacker.h
+ * @author Gutierrez PS <https://github.com/gutierrezps>
+ * @brief Class to unpack the data packed with WirePacker
+ * @date 2020-06-16
+ * 
+ * WireUnpacker is used to unpack the data that was packed
+ * with WirePacker and sent to this device, be it
+ * master->slave or slave->master.
+ * 
+ * After creating the unpacker object, collect packet bytes
+ * with write(). After a complete and valid packet was read,
+ * the payload (data) can be read by using available() and
+ * read() methods.
+ * 
+ * lastError() will indicate if there was an error while
+ * collecting packet bytes, such as invalid length,
+ * premature ending or invalid crc.
+ * 
+ * Expected packet format:
+ *      [0]: start byte (0x02)
+ *      [1]: packet length
+ *      [2]: data[0]
+ *      [3]: data[1]
+ *      ...
+ *      [n+2]: data[n]
+ *      [n+3]: CRC8 of packet length and data
+ *      [n+4]: end byte (0x04)
+ * 
+ */
 #ifndef WireUnpacker_h
 #define WireUnpacker_h
 

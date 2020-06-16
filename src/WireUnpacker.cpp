@@ -1,5 +1,12 @@
-#include "WireCrc.h"
+/**
+ * @file WireUnpacker.cpp
+ * @author Gutierrez PS <https://github.com/gutierrezps>
+ * @brief Class to unpack the data packed with WirePacker
+ * @date 2020-06-16
+ * 
+ */
 #include "WireUnpacker.h"
+#include "WireCrc.h"
 
 WireUnpacker::WireUnpacker()
     :index_(0)
