@@ -78,6 +78,18 @@ public:
     }
 
     /**
+     * Returns packet length so far
+     * 
+     * @return size_t 
+     */
+    size_t packetLength() const {
+        if (isPacketOpen_) {
+            return totalLength_ + 2;
+        }
+        return totalLength_;
+    }
+
+    /**
      * Closes the packet. After that, use avaiable() and read()
      * to get the packet bytes.
      * 
@@ -98,6 +110,12 @@ public:
      * @return int  -1 if there are no bytes to be read
      */
     int read();
+
+    /**
+     * Resets the packing process.
+     * 
+     */
+    void reset();
 
     /**
      * Debug. Prints packet data to Serial.

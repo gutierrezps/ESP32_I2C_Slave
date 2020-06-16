@@ -11,10 +11,7 @@
 
 WirePacker::WirePacker()
 {
-    buffer_[0] = frameStart_;
-    index_ = 2;
-    totalLength_ = 2;
-    isPacketOpen_ = true;
+    reset();
 }
 
 size_t WirePacker::write(uint8_t data)
@@ -23,8 +20,8 @@ size_t WirePacker::write(uint8_t data)
         return 0;
     }
 
-    // start, length, crc and end bytes included
-    if (totalLength_ >= PACKER_BUFFER_LENGTH - 4) {
+    // leave room for crc and end bytes
+    if (totalLength_ >= PACKER_BUFFER_LENGTH - 2) {
         return 0;
     }
 
@@ -89,6 +86,14 @@ int WirePacker::read()
     }
     
     return value;
+}
+
+void WirePacker::reset()
+{
+    buffer_[0] = frameStart_;
+    index_ = 2;
+    totalLength_ = 2;
+    isPacketOpen_ = true;
 }
 
 void WirePacker::printToSerial()
