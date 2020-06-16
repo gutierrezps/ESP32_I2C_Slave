@@ -1,5 +1,5 @@
 /*
-  SlaveTwoWire.cpp - TWI/I2C Slave library for ESP32
+  WireSlave.cpp - TWI/I2C Slave library for ESP32
   Copyright (c) 2006 Nicholas Zambetti.  All right reserved.
 
   This library is free software; you can redistribute it and/or
@@ -28,9 +28,9 @@
 #include <Arduino.h>
 #include <driver/i2c.h>
 
-#include "SWire.h"
+#include "WireSlave.h"
 
-SlaveTwoWire::SlaveTwoWire(uint8_t bus_num)
+TwoWireSlave::TwoWireSlave(uint8_t bus_num)
     :num(bus_num & 1)
     ,portNum(i2c_port_t(bus_num & 1))
     ,sda(-1)
@@ -44,14 +44,14 @@ SlaveTwoWire::SlaveTwoWire(uint8_t bus_num)
     ,txQueued(0)
 {}
 
-SlaveTwoWire::~SlaveTwoWire()
+TwoWireSlave::~TwoWireSlave()
 {
     flush();
     i2c_driver_delete(portNum);
 }
 
 
-bool SlaveTwoWire::begin(int sda, int scl, int address)
+bool TwoWireSlave::begin(int sda, int scl, int address)
 {
     i2c_config_t config;
     config.sda_io_num = gpio_num_t(sda);
@@ -82,7 +82,7 @@ bool SlaveTwoWire::begin(int sda, int scl, int address)
     return res == ESP_OK;
 }
 
-void SlaveTwoWire::update()
+void TwoWireSlave::update()
 {
     rxLength = i2c_slave_read_buffer(portNum, rxBuffer, I2C_BUFFER_LENGTH, 0);
     
@@ -102,7 +102,7 @@ void SlaveTwoWire::update()
     }
 }
 
-size_t SlaveTwoWire::write(uint8_t data)
+size_t TwoWireSlave::write(uint8_t data)
 {
     if (txLength >= I2C_BUFFER_LENGTH) {
         return 0;
@@ -114,7 +114,7 @@ size_t SlaveTwoWire::write(uint8_t data)
     return 1;
 }
 
-size_t SlaveTwoWire::write(const uint8_t *data, size_t quantity)
+size_t TwoWireSlave::write(const uint8_t *data, size_t quantity)
 {
     for (size_t i = 0; i < quantity; ++i) {
         if (!write(data[i])) {
@@ -124,12 +124,12 @@ size_t SlaveTwoWire::write(const uint8_t *data, size_t quantity)
     return quantity;
 }
 
-int SlaveTwoWire::available(void)
+int TwoWireSlave::available(void)
 {
     return rxLength - rxIndex;
 }
 
-int SlaveTwoWire::read(void)
+int TwoWireSlave::read(void)
 {
     int value = -1;
     if(rxIndex < rxLength) {
@@ -139,7 +139,7 @@ int SlaveTwoWire::read(void)
     return value;
 }
 
-int SlaveTwoWire::peek(void)
+int TwoWireSlave::peek(void)
 {
     int value = -1;
     if(rxIndex < rxLength) {
@@ -148,7 +148,7 @@ int SlaveTwoWire::peek(void)
     return value;
 }
 
-void SlaveTwoWire::flush(void)
+void TwoWireSlave::flush(void)
 {
     rxIndex = 0;
     rxLength = 0;
@@ -160,15 +160,15 @@ void SlaveTwoWire::flush(void)
     i2c_reset_tx_fifo(portNum);
 }
 
-void SlaveTwoWire::onReceive(void (*function)(int))
+void TwoWireSlave::onReceive(void (*function)(int))
 {
     user_onReceive = function;
 }
 
-void SlaveTwoWire::onRequest(void (*function)(void))
+void TwoWireSlave::onRequest(void (*function)(void))
 {
     user_onRequest = function;
 }
 
-SlaveTwoWire SWire = SlaveTwoWire(0);
-SlaveTwoWire SWire1 = SlaveTwoWire(1);
+TwoWireSlave WireSlave = TwoWireSlave(0);
+TwoWireSlave WireSlave1 = TwoWireSlave(1);

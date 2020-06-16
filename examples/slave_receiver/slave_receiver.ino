@@ -1,4 +1,4 @@
-// SWire Slave Receiver
+// WireSlave Receiver
 // by Gutierrez PS
 // based on the example by Nicholas Zambetti <http://www.zambetti.com>
 
@@ -10,7 +10,7 @@
 
 
 #include <Arduino.h>
-#include <SWire.h>
+#include <WireSlave.h>
 
 #define SDA_PIN 21
 #define SCL_PIN 22
@@ -22,18 +22,18 @@ void setup()
 {
     Serial.begin(115200);
 
-    bool success = SWire.beginSlave(SDA_PIN, SCL_PIN, I2C_SLAVE_ADDR);
+    bool success = WireSlave.begin(SDA_PIN, SCL_PIN, I2C_SLAVE_ADDR);
     if (!success) {
         Serial.println("I2C slave init failed");
         while(1) delay(100);
     }
 
-    SWire.onReceive(receiveEvent);
+    WireSlave.onReceive(receiveEvent);
 }
 
 void loop()
 {
-    SWire.updateSlave();
+    WireSlave.update();
 
     delay(1);
 }
@@ -42,12 +42,12 @@ void loop()
 // this function is registered as an event, see setup()
 void receiveEvent(int howMany)
 {
-    while (1 < Wire.available()) // loop through all but the last
+    while (1 < WireSlave.available()) // loop through all but the last
     {
-        char c = Wire.read(); // receive byte as a character
+        char c = WireSlave.read(); // receive byte as a character
         Serial.print(c);         // print the character
     }
 
-    int x = Wire.read();    // receive byte as an integer
+    int x = WireSlave.read();    // receive byte as an integer
     Serial.println(x);         // print the integer
 }

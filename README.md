@@ -1,4 +1,4 @@
-# SlaveTwoWire
+# TwoWireSlave
 
 This library provides ESP32 Slave functionality as a workaround for the lack
 of support on Arduino core and on ESP-IDF. **There are limitations though,**
@@ -20,11 +20,11 @@ like default TwoWire library available on AVR and ESP8266 Arduino cores.
 
 ## How it works
 
-Only slave functionality is provided. Two global objects are available, `SWire`
-and `SWire1`. If you want master and slave I2C at the same time, use `Wire` and
-`SWire1` or `SWire` and `Wire1`, but not `Wire`/`SWire` or `Wire1`/`SWire1`.
+Only slave functionality is provided. Two global objects are available, `WireSlave`
+and `WireSlave1`. If you want master and slave I2C at the same time, use `Wire` and
+`WireSlave1` or `WireSlave` and `Wire1`, but not `Wire`/`WireSlave` or `Wire1`/`WireSlave1`.
 
-`SWire` setup is almost the same as `Wire`. Use `begin()` to set SDA, SCL and
+`WireSlave` setup is almost the same as `Wire`. Use `begin()` to set SDA, SCL and
 address. A boolean is returned, if it's false you're probably trying to use
 invalid pins. Methods `onReceive()` and `onRequest()` are similar to `Wire`,
 but **do not behave as expected**.
@@ -40,14 +40,14 @@ void setup() {
     // ...
 
     // I2C slave setup
-    bool success = SWire.begin(SDA_PIN, SCL_PIN, I2C_SLAVE_ADDR);
+    bool success = WireSlave.begin(SDA_PIN, SCL_PIN, I2C_SLAVE_ADDR);
     if (!success) {
         Serial.println("I2C slave init failed");
         while(1) delay(100);
     }
 
-    SWire.onReceive(receiveEvent);
-    SWire.onRequest(requestEvent);
+    WireSlave.onReceive(receiveEvent);
+    WireSlave.onRequest(requestEvent);
 
     // ...
 }

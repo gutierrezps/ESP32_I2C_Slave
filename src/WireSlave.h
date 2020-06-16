@@ -1,5 +1,5 @@
 /*
-  SlaveTwoWire.h - TWI/I2C Slave library for ESP32
+  WireSlave.h - TWI/I2C Slave library for ESP32
   Copyright (c) 2006 Nicholas Zambetti.  All right reserved.
 
   This library is free software; you can redistribute it and/or
@@ -25,8 +25,8 @@
     as a workaround to temporarily provide I2C Slave functionality
 */
 
-#ifndef SlaveTwoWire_h
-#define SlaveTwoWire_h
+#ifndef TwoWireSlave_h
+#define TwoWireSlave_h
 
 #include <Arduino.h>
 #include <driver/i2c.h>
@@ -34,11 +34,11 @@
 
 #define I2C_BUFFER_LENGTH 128
 
-class SlaveTwoWire : public Stream
+class TwoWireSlave : public Stream
 {
 public:
-    SlaveTwoWire(uint8_t bus_num);
-    ~SlaveTwoWire();
+    TwoWireSlave(uint8_t bus_num);
+    ~TwoWireSlave();
 
     bool begin(int sda, int scl, int address);
     void update();
@@ -96,7 +96,7 @@ private:
 };
 
 
-extern SlaveTwoWire SWire;
-extern SlaveTwoWire SWire1;
+extern TwoWireSlave WireSlave;
+extern TwoWireSlave WireSlave1;
 
 #endif

@@ -1,4 +1,4 @@
-// SWire Slave Sender
+// WireSlave Sender
 // by Gutierrez PS
 // based on the example of the same name by Nicholas Zambetti <http://www.zambetti.com>
 
@@ -10,7 +10,7 @@
 
 
 #include <Arduino.h>
-#include <SWire.h>
+#include <WireSlave.h>
 
 #define SDA_PIN 21
 #define SCL_PIN 22
@@ -20,18 +20,18 @@ void setup()
 {
     Serial.begin(115200);
 
-    bool res = SWire.beginSlave(SDA_PIN, SCL_PIN, I2C_SLAVE_ADDR);
+    bool res = WireSlave.begin(SDA_PIN, SCL_PIN, I2C_SLAVE_ADDR);
     if (!res) {
         Serial.println("I2C slave init failed");
         while(1) delay(100);
     }
 
-    SWire.onRequest(requestEvent);
+    WireSlave.onRequest(requestEvent);
 }
 
 void loop()
 {
-    SWire.updateSlave();
+    WireSlave.update();
 
     delay(1);
 }
@@ -44,6 +44,6 @@ void requestEvent()
 {
     // respond with message of 6 bytes
     // as expected by master
-    SWire.print("y is ");
-    SWire.write(y++);
+    WireSlave.print("y is ");
+    WireSlave.write(y++);
 }
