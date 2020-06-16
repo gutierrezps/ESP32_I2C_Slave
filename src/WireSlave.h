@@ -1,36 +1,32 @@
-/*
-  WireSlave.h - TWI/I2C Slave library for ESP32
-  Copyright (c) 2006 Nicholas Zambetti.  All right reserved.
-
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License, or (at your option) any later version.
-
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-  Modified 2012 by Todd Krein (todd@krein.org) to implement repeated starts
-  Modified December 2014 by Ivan Grokhotkov (ivan@esp8266.com) - esp8266 support
-  Modified April 2015 by Hrsto Gochkov (ficeto@ficeto.com) - alternative esp8266 support
-  Modified November 2017 by Chuck Todd <stickbreaker on GitHub>
-    to use ISR and increase stability.
-  Modified June 2020 by Gutierrez PS <gutierrezps on GitHub>
-    as a workaround to temporarily provide I2C Slave functionality
-*/
+/**
+ * @file WireSlave.h
+ * @author Gutierrez PS <https://github.com/gutierrezps>
+ * @brief TWI/I2C slave library for ESP32 based on ESP-IDF slave API
+ * @date 2020-06-16
+ * 
+ * Based on original TwoWire library by Nicholas Zambetti.
+ * 
+ * Adapted to ESP32 as a workaround to temporarily provide
+ * I2C slave functionality. Uses i2c_slave_read_buffer and
+ * i2c_slave_write_buffer. As the reading/writing process
+ * through those functions is not interrupt-based, these
+ * operations may happen while the master is sending or
+ * requesting data, consequently breaking the data. To
+ * mitigate this, WirePacker and WireUnpacker are used on
+ * WireSlave, and must also be used by master. WirePacker
+ * is used to pack the data, and WireUnpacker is used to
+ * collect incoming data, check if it's not broken, and
+ * then pass it forward to the user callback.
+ * 
+ */
 
 #ifndef TwoWireSlave_h
 #define TwoWireSlave_h
 
-#include <Arduino.h>
+#include <stdint.h>
 #include <driver/i2c.h>
 #include <Stream.h>
+#include <WireUnpacker.h>
 
 #define I2C_BUFFER_LENGTH 128
 
@@ -93,6 +89,8 @@ private:
 
     void (*user_onRequest)(void);
     void (*user_onReceive)(int);
+
+    WireUnpacker unpacker_;
 };
 
 

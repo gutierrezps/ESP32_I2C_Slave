@@ -1,29 +1,10 @@
-/*
-  WireSlave.cpp - TWI/I2C Slave library for ESP32
-  Copyright (c) 2006 Nicholas Zambetti.  All right reserved.
-
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License, or (at your option) any later version.
-
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-  Modified 2012 by Todd Krein (todd@krein.org) to implement repeated starts
-  Modified December 2014 by Ivan Grokhotkov (ivan@esp8266.com) - esp8266 support
-  Modified April 2015 by Hrsto Gochkov (ficeto@ficeto.com) - alternative esp8266 support
-  Modified November 2017 by Chuck Todd <stickbreaker on GitHub>
-    to use ISR and increase stability.
-  Modified June 2020 by Gutierrez PS <gutierrezps on GitHub>
-    as a workaround to temporarily provide I2C Slave functionality
-*/
+/**
+ * @file WireSlave.cpp
+ * @author Gutierrez PS <https://github.com/gutierrezps>
+ * @brief TWI/I2C slave library for ESP32 based on ESP-IDF slave API
+ * @date 2020-06-16
+ * 
+ */
 
 #include <Arduino.h>
 #include <driver/i2c.h>
@@ -42,6 +23,7 @@ TwoWireSlave::TwoWireSlave(uint8_t bus_num)
     ,txLength(0)
     ,txAddress(0)
     ,txQueued(0)
+    ,unpacker_()
 {}
 
 TwoWireSlave::~TwoWireSlave()
@@ -84,14 +66,49 @@ bool TwoWireSlave::begin(int sda, int scl, int address)
 
 void TwoWireSlave::update()
 {
-    rxLength = i2c_slave_read_buffer(portNum, rxBuffer, I2C_BUFFER_LENGTH, 0);
+    uint8_t inputBuffer[I2C_BUFFER_LENGTH] = {0};
+    uint16_t inputLen = 0;
+
+    inputLen = i2c_slave_read_buffer(portNum, inputBuffer, I2C_BUFFER_LENGTH, 0);
     
-    if (rxLength == 0) {
+    if (inputLen == 0) {
+        // nothing received
         return;
     }
 
-    rxIndex = 0;
-    if (user_onReceive) user_onReceive(rxLength);
+    if (!unpacker_.isPacketOpen()) {
+        // start unpacking
+        unpacker_.reset();
+    }
+
+    unpacker_.write(inputBuffer, inputLen);
+
+    if (unpacker_.isPacketOpen() || unpacker_.totalLength() == 0) {
+        // still waiting bytes,
+        // or received bytes that are not inside a packet
+        return;
+    }
+
+    if (unpacker_.hasError()) {
+        return;
+    }
+    
+    if (unpacker_.available()) {
+        rxIndex = 0;
+        rxLength = unpacker_.available();
+        
+        // transfer bytes from packet to rxBuffer
+        while (unpacker_.available()) {
+            rxBuffer[rxIndex] = unpacker_.read();
+            rxIndex++;
+        }
+        rxIndex = 0;
+
+        // call user callback
+        if (user_onReceive) {
+            user_onReceive(rxLength);
+        }
+    }
 
     if (user_onRequest) {
         txIndex = 0;
