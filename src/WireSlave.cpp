@@ -23,8 +23,11 @@ TwoWireSlave::TwoWireSlave(uint8_t bus_num)
     ,txLength(0)
     ,txAddress(0)
     ,txQueued(0)
+    ,packer_()
     ,unpacker_()
-{}
+{
+    
+}
 
 TwoWireSlave::~TwoWireSlave()
 {
@@ -113,7 +116,16 @@ void TwoWireSlave::update()
     if (user_onRequest) {
         txIndex = 0;
         txLength = 0;
+        packer_.reset();
         user_onRequest();
+        packer_.end();
+
+        while (packer_.available()) {
+            txBuffer[txIndex] = packer_.read();
+            ++txIndex;
+        }
+        txLength = txIndex;
+        
         i2c_reset_tx_fifo(portNum);
         i2c_slave_write_buffer(portNum, txBuffer, txLength, 0);
     }
@@ -121,14 +133,11 @@ void TwoWireSlave::update()
 
 size_t TwoWireSlave::write(uint8_t data)
 {
-    if (txLength >= I2C_BUFFER_LENGTH) {
+    if (packer_.packetLength() >= I2C_BUFFER_LENGTH) {
         return 0;
     }
 
-    txBuffer[txIndex] = data;
-    ++txIndex;
-    txLength = txIndex;
-    return 1;
+    return packer_.write(data);
 }
 
 size_t TwoWireSlave::write(const uint8_t *data, size_t quantity)

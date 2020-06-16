@@ -26,6 +26,7 @@
 #include <stdint.h>
 #include <driver/i2c.h>
 #include <Stream.h>
+#include <WirePacker.h>
 #include <WireUnpacker.h>
 
 #define I2C_BUFFER_LENGTH 128
@@ -90,6 +91,7 @@ private:
     void (*user_onRequest)(void);
     void (*user_onReceive)(int);
 
+    WirePacker packer_;
     WireUnpacker unpacker_;
 };
 
