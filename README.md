@@ -7,22 +7,22 @@ of support on Arduino core and on ESP-IDF. **There are caveats though,**
 ## Usage
 
 On the slave side, simply use `WireSlave` instead of `Wire`. See examples
-[slave_receiver.ino](10) and [slave_sender.ino](11).
+[slave_receiver.ino][receiver_example] and [slave_sender.ino][sender_example].
 
 On the master side though, data must be packed with `WirePacker` before being
-sent with `Wire` (see example [master_writer.ino](12)). Reading data is a little
-more tricky, so class `WireSlaveRequest` must be used (see example
-[master_reader.ino](13)).
+sent with `Wire` (see example [master_writer.ino][writer_example]). Reading data
+is a little more tricky, so class `WireSlaveRequest` must be used (see example
+[master_reader.ino][reader_example]).
 
 ## Context
 
 Right now, the I2C Slave functionality is not implemented in ESP32 Arduino Core
-([see issue #118][1]).
+([see issue #118][issue-118-arduino]).
 
 The ESP IDF, on the other hand, provides only two functions for the ESP32 to
-[communicate as a slave device][2], and although it says a custom ISR function
-can be defined, there's no example on how to do it properly (like reading
-and clearing interrupt flags).
+[communicate as a slave device][idf-api], and although it says a custom ISR
+function can be defined, there's no example on how to do it properly (like
+reading and clearing interrupt flags).
 
 In this context, this library was made as a workaround to temporarily provide
 ESP32 the ability to work as a I2C slave device. As such, it doesn't work
@@ -80,13 +80,14 @@ literally breaking the data. This doesn't seem to happen in the first case, that
 is, the input buffer seems to contain whole bytes only.
 
 To mitigate this, a packing format was implemented with `WirePacker` and
-`WireUnpacker`. The packet format is the following, where _n_ is the number
-of data bytes, and CRC is calculated from bytes 1 to n+2 (length + data):
+`WireUnpacker`. The packet format is detailed below, where _n_ is the number
+of payload bytes (data), and CRC is calculated from bytes 1 to n+2 (length +
+payload).
 
-|            | Start | Length | Data[0] | Data[1] | ... | Data[n-1] |        CRC8       |  End |
-|-----------:|:-----:|:------:|:-------:|:-------:|:---:|:---------:|:-----------------:|:----:|
-| byte index |   0   |    1   |    2    |    3    | ... |    n+2    |        n+3        |  n+4 |
-|      value |  0x02 |   n+4  |    x    |    x    | ... |     x     | crc of [1..(n+2)] | 0x04 |
+|            | Start | Length | Data\[0\] | Data\[1\] | ... | Data\[n-1\] |         CRC8        |  End |
+|-----------:|:-----:|:------:|:---------:|:---------:|:---:|:-----------:|:-------------------:|:----:|
+| byte index |   0   |    1   |     2     |     3     | ... |     n+2     |         n+3         |  n+4 |
+|      value |  0x02 |   n+4  | data\[0\] | data\[1\] | ... | data\[n-1\] | crc of \[1..(n+2)\] | 0x04 |
 
 On the slave side, the class `WireSlave` internally packs and unpacks the data
 using `WirePacker` and `WireUnpacker`, so `onReceive()` and `onRequest()`
@@ -111,24 +112,24 @@ Here are some links to follow the status of official support for I2C slave on
 ESP32. As soon as it's available and well documented, this library will no
 longer be needed.
 
-* Issue #118 on arduino-esp32: [I2C Slave not implemented][1]
-* Issue #2202 on esp-idf: [I2C slave driver problems (IDFGH-297)][3]
-* Pull request #2096 on esp-idf: [New I2c slave driver (IDFGH-2501)][4]
-* Issue #3099 on esp-idf: [I2C interrupt (IDFGH-661)][5]
+* Issue #118 on arduino-esp32: [I2C Slave not implemented][issue-118-arduino]
+* Issue #2202 on esp-idf: [I2C slave driver problems (IDFGH-297)][issue-2202-idf]
+* Pull request #2096 on esp-idf: [New I2c slave driver (IDFGH-2501)][pr-2096-idf]
+* Issue #3099 on esp-idf: [I2C interrupt (IDFGH-661)][issue-3099-idf]
 
 ## Resources
 
-* ESP IDF API for I2C slave: [I2C Driver][2]
-* I2C example for ESP IDF API: [i2c_example_main.c][6]
+* ESP IDF API for I2C slave: [I2C Driver][idf-api]
+* I2C example for ESP IDF API: [i2c_example_main.c][idf-i2c-example]
 
-[1]: <https://github.com/espressif/arduino-esp32/issues/118>
-[2]: <https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/i2c.html#communication-as-slave>
-[3]: <https://github.com/espressif/esp-idf/issues/2202>
-[4]: <https://github.com/espressif/esp-idf/pull/2096>
-[5]: <https://github.com/espressif/esp-idf/issues/3099>
-[6]: <https://github.com/espressif/esp-idf/blob/master/examples/peripherals/i2c/i2c_self_test/main/i2c_example_main.c>
+[issue-118-arduino]: https://github.com/espressif/arduino-esp32/issues/118
+[idf-api]: https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/i2c.html#communication-as-slave
+[issue-2202-idf]: https://github.com/espressif/esp-idf/issues/2202
+[pr-2096-idf]: https://github.com/espressif/esp-idf/pull/2096
+[issue-3099-idf]: https://github.com/espressif/esp-idf/issues/3099
+[idf-i2c-example]: https://github.com/espressif/esp-idf/blob/master/examples/peripherals/i2c/i2c_self_test/main/i2c_example_main.c
 
-[10]: <examples/slave_receiver/slave_receiver.ino>
-[11]: <examples/slave_sender/slave_sender.ino>
-[12]: <examples/master_writer/master_writer.ino>
-[13]: <examples/master_reader/master_reader.ino>
+[receiver_example]: examples/slave_receiver/slave_receiver.ino
+[sender_example]: examples/slave_sender/slave_sender.ino
+[writer_example]: examples/master_writer/master_writer.ino
+[reader_example]: examples/master_reader/master_reader.ino
