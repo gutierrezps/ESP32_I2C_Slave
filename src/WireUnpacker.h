@@ -23,9 +23,9 @@
  *      [2]: data[0]
  *      [3]: data[1]
  *      ...
- *      [n+2]: data[n]
- *      [n+3]: CRC8 of packet length and data
- *      [n+4]: end byte (0x04)
+ *      [n+1]: data[n-1]
+ *      [n+2]: CRC8 of packet length and data
+ *      [n+3]: end byte (0x04)
  * 
  */
 #ifndef WireUnpacker_h

@@ -81,13 +81,13 @@ is, the input buffer seems to contain whole bytes only.
 
 To mitigate this, a packing format was implemented with `WirePacker` and
 `WireUnpacker`. The packet format is detailed below, where _n_ is the number
-of payload bytes (data), and CRC is calculated from bytes 1 to n+2 (length +
+of payload bytes (data), and CRC is calculated from bytes 1 to n+1 (length +
 payload).
 
 |            | Start | Length | Data\[0\] | Data\[1\] | ... | Data\[n-1\] |         CRC8        |  End |
 |-----------:|:-----:|:------:|:---------:|:---------:|:---:|:-----------:|:-------------------:|:----:|
-| byte index |   0   |    1   |     2     |     3     | ... |     n+2     |         n+3         |  n+4 |
-|      value |  0x02 |   n+4  | data\[0\] | data\[1\] | ... | data\[n-1\] | crc of \[1..(n+2)\] | 0x04 |
+| byte index |   0   |    1   |     2     |     3     | ... |     n+1     |         n+2         |  n+3 |
+|      value |  0x02 |   n+4  | data\[0\] | data\[1\] | ... | data\[n-1\] | crc of \[1..(n+1)\] | 0x04 |
 
 On the slave side, the class `WireSlave` internally packs and unpacks the data
 using `WirePacker` and `WireUnpacker`, so `onReceive()` and `onRequest()`
