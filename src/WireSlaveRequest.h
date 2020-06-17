@@ -40,11 +40,11 @@ public:
     /**
      * Construct a new WireSlaveRequest object
      * 
-     * @param wire          TwoWire object (Wire or Wire1)
-     * @param address       slave address
-     * @param readLength    max packet length
+     * @param wire              TwoWire object (Wire or Wire1)
+     * @param address           slave address
+     * @param responseLength    max payload length
      */
-    WireSlaveRequest(TwoWire &wire, uint8_t address, uint16_t readLength);
+    WireSlaveRequest(TwoWire &wire, uint8_t address, uint16_t responseLength);
 
     /**
      * Delay in milliseconds between retry attempts

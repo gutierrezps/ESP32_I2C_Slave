@@ -1,9 +1,9 @@
 #include "WireSlaveRequest.h"
 
-WireSlaveRequest::WireSlaveRequest(TwoWire &wire, uint8_t address, uint16_t readLength)
+WireSlaveRequest::WireSlaveRequest(TwoWire &wire, uint8_t address, uint16_t responseLength)
     :wire_(wire)
     ,address_(address)
-    ,readLength_(readLength)
+    ,readLength_(responseLength + 4)    // start, length, crc and end bytes
     ,retryDelay_(10)
     ,maxAttempts_(5)
     ,lastStatus_(NONE)
