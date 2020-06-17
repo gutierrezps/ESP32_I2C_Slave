@@ -1,0 +1,20 @@
+{
+    "name": "ESP32 I2C Slave",
+    "description": "I2C slave library for ESP32",
+    "keywords": "esp32, i2c, slave",
+    "authors":
+    {
+        "name": "Gutierrez PS",
+        "url": "https://github.com/gutierrezps",
+        "maintainer": true
+    },
+    "repository":
+    {
+        "type": "git",
+        "url": "https://github.com/gutierrezps/ESP32_I2C_Slave.git"
+    },
+    "version": "0.1.0",
+    "license": "LGPL-2.1-only",
+    "frameworks": "arduino",
+    "platforms": "espressif32"
+}

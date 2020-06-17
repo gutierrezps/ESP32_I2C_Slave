@@ -1,0 +1,64 @@
+#######################################
+# Syntax Coloring Map WireSlave
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+WireCrc				KEYWORD1
+WirePacker			KEYWORD1
+WireSlave			KEYWORD1
+WireSlaveRequest	KEYWORD1
+WireUnpacker		KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+# WireCrc
+calc		KEYWORD2
+update		KEYWORD2
+
+# WirePacker
+write			KEYWORD2
+packetLength	KEYWORD2
+end				KEYWORD2
+available		KEYWORD2
+read			KEYWORD2
+reset			KEYWORD2
+printToSerial	KEYWORD2
+
+# WireSlave
+begin			KEYWORD2
+update			KEYWORD2
+peek			KEYWORD2
+flush			KEYWORD2
+onReceive		KEYWORD2
+onRequest		KEYWORD2
+
+# WireSlaveRequest
+setRetryDelay	KEYWORD2
+setAttempts		KEYWORD2
+request			KEYWORD2
+lastStatus		KEYWORD2
+
+# WireUnpacker
+hasError		KEYWORD2
+lastError		KEYWORD2
+isPacketOpen	KEYWORD2
+totalLength		KEYWORD2
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+PACKER_BUFFER_LENGTH	LITERAL1
+I2C_BUFFER_LENGTH		LITERAL1
+NONE					LITERAL1
+PACKET_READ				LITERAL1
+SLAVE_NOT_FOUND			LITERAL1
+PACKET_ERROR			LITERAL1
+MAX_ATTEMPTS			LITERAL1
+INVALID_CRC				LITERAL1
+INVALID_LENGTH			LITERAL1
+UNPACKER_BUFFER_LENGTH	LITERAL1
