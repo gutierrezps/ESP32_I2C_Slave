@@ -1,17 +1,16 @@
 // Wire Master Writer
-// by Gutierrez PS
-// based on the example of the same name by Nicholas Zambetti <http://www.zambetti.com>
+// by Gutierrez PS <https://github.com/gutierrezps>
+// ESP32 I2C slave library: <https://github.com/gutierrezps/ESP32_I2C_Slave>
+// based on the example by Nicholas Zambetti <http://www.zambetti.com>
 
-// Demonstrates use of the Wire library
-// Writes data to an I2C/TWI slave device
-// Refer to the "Wire Slave Receiver" example for use with this
-
-// Created 29 March 2006
-
-// This example code is in the public domain.
+// Demonstrates use of the Wire and WirePacker libraries.
+// Writes data to an ESP32 I2C/TWI slave device that
+// uses ESP32 I2C Slave library. 
+// Refer to the "slave_receiver" example for use with this
 
 #include <Arduino.h>
 #include <Wire.h>
+#include <WirePacker.h>
 
 #define SDA_PIN 21
 #define SCL_PIN 22
@@ -23,15 +22,31 @@ void setup()
     Wire.begin(SDA_PIN, SCL_PIN);   // join i2c bus
 }
 
-byte x = 0;
-
 void loop()
 {
-    Wire.beginTransmission(I2C_SLAVE_ADDR); // transmit to device #4
-    Wire.write("x is ");        // sends five bytes
-    Wire.write(x);              // sends one byte  
-    Wire.endTransmission();    // stop transmitting
+    static unsigned long lastWireTransmit = 0;
+    static byte x = 0;
 
-    x++;
-    delay(500);
+    // send data to WireSlave device every 1000 ms
+    if (millis() - lastWireTransmit > 1000) {
+        // first create a WirePacker that will assemble a packet
+        WirePacker packer;
+
+        // then add data the same way as you would with Wire
+        packer.write("x is ");
+        packer.write(x);
+
+        // after adding all data you want to send, close the packet
+        packer.end();
+
+        // now transmit the packed data
+        Wire.beginTransmission(I2C_SLAVE_ADDR);
+        while (packer.available()) {    // write every packet byte
+            Wire.write(packer.read());
+        }
+        Wire.endTransmission();         // stop transmitting
+
+        x++;
+        lastWireTransmit = millis();
+    }
 }

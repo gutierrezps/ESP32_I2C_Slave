@@ -1,15 +1,15 @@
 // WireSlave Receiver
-// by Gutierrez PS
+// by Gutierrez PS <https://github.com/gutierrezps>
+// ESP32 I2C slave library: <https://github.com/gutierrezps/ESP32_I2C_Slave>
 // based on the example by Nicholas Zambetti <http://www.zambetti.com>
 
-// Demonstrates use of the Wire library
-// Receives data as an I2C/TWI slave device
-// Refer to the "Wire Master Writer" example for use with this
-
-// This example code is in the public domain.
-
+// Demonstrates use of the WireSlave library for ESP32.
+// Receives data as an I2C/TWI slave device; data must
+// be packed using WirePacker.
+// Refer to the "master_writer" example for use with this
 
 #include <Arduino.h>
+#include <Wire.h>
 #include <WireSlave.h>
 
 #define SDA_PIN 21
@@ -33,21 +33,26 @@ void setup()
 
 void loop()
 {
+    // the slave response time is directly related to how often
+    // this update() method is called, so avoid using long delays
+    // inside loop()
     WireSlave.update();
 
+    // let I2C and other ESP32 peripherals interrupts work
     delay(1);
 }
 
-// function that executes whenever data is received from master
+// function that executes whenever a complete and valid packet
+// is received from master
 // this function is registered as an event, see setup()
 void receiveEvent(int howMany)
 {
-    while (1 < WireSlave.available()) // loop through all but the last
+    while (1 < WireSlave.available()) // loop through all but the last byte
     {
-        char c = WireSlave.read(); // receive byte as a character
-        Serial.print(c);         // print the character
+        char c = WireSlave.read();  // receive byte as a character
+        Serial.print(c);            // print the character
     }
 
-    int x = WireSlave.read();    // receive byte as an integer
-    Serial.println(x);         // print the integer
+    int x = WireSlave.read();   // receive byte as an integer
+    Serial.println(x);          // print the integer
 }
