@@ -1,8 +1,18 @@
-# TwoWireSlave
+# ESP32 I2C Slave
 
 This library provides ESP32 Slave functionality as a workaround for the lack
-of support on Arduino core and on ESP-IDF. **There are limitations though,**
+of support on Arduino core and on ESP-IDF. **There are caveats though,**
 **keep reading**.
+
+## Usage
+
+On the slave side, simply use `WireSlave` instead of `Wire`. See examples
+[slave_receiver.ino](10) and [slave_sender.ino](11).
+
+On the master side though, data must be packed with `WirePacker` before being
+sent with `Wire` (see example [master_writer.ino](12)). Reading data is a little
+more tricky, so class `WireSlaveRequest` must be used (see example
+[master_reader.ino](13)).
 
 ## Context
 
@@ -20,12 +30,13 @@ like default TwoWire library available on AVR and ESP8266 Arduino cores.
 
 ## How it works
 
-Only slave functionality is provided. Two global objects are available, `WireSlave`
-and `WireSlave1`. If you want master and slave I2C at the same time, use `Wire` and
-`WireSlave1` or `WireSlave` and `Wire1`, but not `Wire`/`WireSlave` or `Wire1`/`WireSlave1`.
+Only slave functionality is provided. Two global objects are available,
+`WireSlave` and `WireSlave1`. If you want master and slave I2C at the same time,
+use `Wire` and `WireSlave1` or `WireSlave` and `Wire1`, but not
+`Wire`/`WireSlave` or `Wire1`/`WireSlave1`.
 
-`WireSlave` setup is almost the same as `Wire`. Use `begin()` to set SDA, SCL and
-address. A boolean is returned, if it's false you're probably trying to use
+`WireSlave` setup is almost the same as `Wire`. Use `begin()` to set SDA, SCL
+and address. A boolean is returned, if it's false you're probably trying to use
 invalid pins. Methods `onReceive()` and `onRequest()` are similar to `Wire`,
 but **do not behave as expected**.
 
@@ -53,28 +64,46 @@ void setup() {
 }
 ```
 
-The Slave API provided by ESP-IDF consists of two functions: one to
-read the input buffer and other to write to the output buffer. Without
-interruption support, the input buffer must be read periodically to know
-if the master has sent something, and the output buffer must be filled
-before the master request data. That's why `onReceive()` and `onRequest()`
-**do not work as in default TwoWire**.
+The Slave API provided by ESP-IDF consists of two functions: one to read the
+input buffer and other to write to the output buffer. Without interruption
+support, the input buffer must be read periodically to know if the master has
+sent something, and the output buffer must be filled before the master requests
+data.
 
-The function passed to `onReceive()` is called whenever there's data in
-the I2C input buffer. **CAVEAT**: the master device may not have finished
-writing into the buffer. If this happens, `receiveEvent()` will be called
-twice, one with each fragment.
+This usage of the API functions raise some problems. The first one is that when
+reading the input buffer, the master may not have finished to send the data.
+That means another buffer read is required to fetch the remaining bytes.
+Likewise, the master may request data while the slave is filling the output
+buffer. This last scenario is even more problematic since the slave may
+be interrupted in the middle of a byte write, thus not only spliting but
+literally breaking the data. This doesn't seem to happen in the first case, that
+is, the input buffer seems to contain whole bytes only.
 
-Since there's no way to know when the master will read data, the function
-passed to `onRequest()` will also be called when the master sends data.
-That is why a master reading **must** be preceded by a write, as shown in
-example `master_reader`. **CAVEAT**: the slave may not have finished to write
-into the output buffer when the master requests data.
+To mitigate this, a packing format was implemented with `WirePacker` and
+`WireUnpacker`. The packet format is the following, where _n_ is the number
+of data bytes, and CRC is calculated from bytes 1 to n+2 (length + data):
+
+|            | Start | Length | Data[0] | Data[1] | ... | Data[n-1] |        CRC8       |  End |
+|-----------:|:-----:|:------:|:-------:|:-------:|:---:|:---------:|:-----------------:|:----:|
+| byte index |   0   |    1   |    2    |    3    | ... |    n+2    |        n+3        |  n+4 |
+|      value |  0x02 |   n+4  |    x    |    x    | ... |     x     | crc of [1..(n+2)] | 0x04 |
+
+On the slave side, the class `WireSlave` internally packs and unpacks the data
+using `WirePacker` and `WireUnpacker`, so `onReceive()` and `onRequest()`
+usages are **almost** the same. The only difference is that `onRequest()`
+is called whenever the master sends data, since there's no way to know
+when the master will request or is requesting data. Also note that
+**data that is not packet will be ignored by the slave**.
+
+On the master side, `WirePacker` is available to pack the data before sending
+through `Wire`. Reading data is a little more tricky because of the data break
+problem, so class `WireSlaveRequest` was created to read the packed data
+from the slave, unpack it, and in case of problems it'll try to read again.
 
 After setup, `update()` must be called periodically inside `loop()`. It's
 the `update()` function that will read the input buffer and trigger
 the other actions. Therefore, the slave response time is directly related
-to the other things being done inside `loop()` (see `master_reader` example).
+to the other things being done inside `loop()`.
 
 ## Official I2C slave support
 
@@ -98,3 +127,8 @@ longer be needed.
 [4]: <https://github.com/espressif/esp-idf/pull/2096>
 [5]: <https://github.com/espressif/esp-idf/issues/3099>
 [6]: <https://github.com/espressif/esp-idf/blob/master/examples/peripherals/i2c/i2c_self_test/main/i2c_example_main.c>
+
+[10]: <examples/slave_receiver/slave_receiver.ino>
+[11]: <examples/slave_sender/slave_sender.ino>
+[12]: <examples/master_writer/master_writer.ino>
+[13]: <examples/master_reader/master_reader.ino>
