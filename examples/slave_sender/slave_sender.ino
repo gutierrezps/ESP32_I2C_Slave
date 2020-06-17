@@ -1,20 +1,24 @@
 // WireSlave Sender
-// by Gutierrez PS
-// based on the example of the same name by Nicholas Zambetti <http://www.zambetti.com>
+// by Gutierrez PS <https://github.com/gutierrezps>
+// ESP32 I2C slave library: <https://github.com/gutierrezps/ESP32_I2C_Slave>
+// based on the example by Nicholas Zambetti <http://www.zambetti.com>
 
-// Demonstrates use of the Wire library
-// Sends data as an I2C/TWI slave device
-// Refer to the "Wire Master Reader" example for use with this
-
-// This example code is in the public domain.
-
+// Demonstrates use of the WireSlave library for ESP32.
+// Sends data as an I2C/TWI slave device; data is packed using WirePacker.
+// In order to the slave send the data, an empty packet must
+// be received first. This is internally done by the WireSlaveRequest class.
+// The data is sent using WirePacker, also done internally by WireSlave.
+// Refer to the "master_reader" example for use with this
 
 #include <Arduino.h>
+#include <Wire.h>
 #include <WireSlave.h>
 
 #define SDA_PIN 21
 #define SCL_PIN 22
 #define I2C_SLAVE_ADDR 0x04
+
+void requestEvent();
 
 void setup()
 {
@@ -31,19 +35,26 @@ void setup()
 
 void loop()
 {
+    // the slave response time is directly related to how often
+    // this update() method is called, so avoid using long delays
+    // inside loop()
     WireSlave.update();
 
+    // let I2C and other ESP32 peripherals interrupts work
     delay(1);
 }
 
-// function that executes whenever data is requested by master
-// this function is registered as an event, see setup()
-byte y = 0;
-
+// function that executes whenever **a data packet is sent by master**,
+// since there's no way to know (at the moment) when master
+// will request or is requesting data.
+// this function is registered as an event, see setup().
+// do not perform time-consuming tasks inside this function,
+// do them elsewhere and simply read the data you wish to
+// send inside here.
 void requestEvent()
 {
-    // respond with message of 6 bytes
-    // as expected by master
+    static byte y = 0;
+    
     WireSlave.print("y is ");
     WireSlave.write(y++);
 }
