@@ -39,7 +39,8 @@ class WireUnpacker
 {
 public:
 
-    enum Error : char {
+    enum Error : char
+    {
         NONE = 0,
         INVALID_CRC,
         INVALID_LENGTH
@@ -90,11 +91,13 @@ public:
      */
     void reset();
 
-    bool hasError() const {
+    bool hasError() const
+    {
         return lastError_ != Error::NONE;
     }
     
-    Error lastError() const {
+    Error lastError() const
+    {
         return lastError_;
     }
 
@@ -103,7 +106,8 @@ public:
      * bytes are expected.
      * 
      */
-    bool isPacketOpen() const {
+    bool isPacketOpen() const
+    {
         return isPacketOpen_;
     }
 
@@ -111,7 +115,8 @@ public:
      * Returns number of packet bytes read so far.
      * 
      */
-    uint16_t totalLength() const {
+    uint16_t totalLength() const
+    {
         return totalLength_;
     }
 

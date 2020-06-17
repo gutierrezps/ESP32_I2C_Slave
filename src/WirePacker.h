@@ -82,7 +82,8 @@ public:
      * 
      * @return size_t 
      */
-    size_t packetLength() const {
+    size_t packetLength() const
+    {
         if (isPacketOpen_) {
             return totalLength_ + 2;
         }
