@@ -10,7 +10,7 @@ WireSlaveRequest::WireSlaveRequest(TwoWire &wire, uint8_t address, uint16_t read
 {
 }
 
-bool WireSlaveRequest::request(uint8_t address = 0)
+bool WireSlaveRequest::request(uint8_t address)
 {
     if (address != 0) {
         address_ = address;
@@ -101,7 +101,7 @@ size_t WireSlaveRequest::available()
     return rxLength_ - rxIndex_;
 }
 
-int WireSlaveRequest::read(void)
+int WireSlaveRequest::read()
 {
     int value = -1;
     if (lastStatus_ == PACKET_READ && rxIndex_ < rxLength_) {
