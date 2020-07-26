@@ -110,6 +110,8 @@ int WireUnpacker::read(void)
     return value;
 }
 
+#ifdef UNPACKER_DEBUG
+
 void WireUnpacker::printToSerial()
 {
     Serial.printf("totalLen: %d, expectedLen: %d, ", totalLength_, expectedLength_);
@@ -153,6 +155,7 @@ void WireUnpacker::printToSerial()
     Serial.println();
 }
 
+#endif      // ifdef UNPACKER_DEBUG
 
 void WireUnpacker::reset()
 {

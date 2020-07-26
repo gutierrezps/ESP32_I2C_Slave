@@ -96,6 +96,9 @@ void WirePacker::reset()
     isPacketOpen_ = true;
 }
 
+
+#ifdef PACKER_DEBUG
+
 void WirePacker::printToSerial()
 {
     Serial.printf("length: %d, ", totalLength_);
@@ -128,3 +131,5 @@ void WirePacker::printToSerial()
 
     Serial.println();
 }
+
+#endif      // ifdef PACKER_DEBUG

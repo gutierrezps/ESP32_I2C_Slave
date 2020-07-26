@@ -33,6 +33,8 @@
 
 #define PACKER_BUFFER_LENGTH 128
 
+// #define PACKER_DEBUG
+
 class WirePacker : public Print
 {
 public:
@@ -122,7 +124,9 @@ public:
      * Debug. Prints packet data to Serial.
      * 
      */
+    #ifdef PACKER_DEBUG
     void printToSerial();
+    #endif
 
 private:
     const uint8_t frameStart_ = 0x02;

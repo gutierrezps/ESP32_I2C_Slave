@@ -35,6 +35,8 @@
 
 #define UNPACKER_BUFFER_LENGTH 128
 
+// #define UNPACKER_DEBUG
+
 class WireUnpacker
 {
 public:
@@ -124,7 +126,9 @@ public:
      * Debug. Prints packet data to Serial.
      * 
      */
+    #ifdef UNPACKER_DEBUG
     void printToSerial();
+    #endif
 
 private:
     const uint8_t frameStart_ = 0x02;
