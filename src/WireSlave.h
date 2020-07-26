@@ -22,6 +22,7 @@
 
 #ifndef TwoWireSlave_h
 #define TwoWireSlave_h
+#ifdef ARDUINO_ARCH_ESP32
 
 #include <stdint.h>
 #include <driver/i2c.h>
@@ -99,4 +100,5 @@ private:
 extern TwoWireSlave WireSlave;
 extern TwoWireSlave WireSlave1;
 
-#endif
+#endif      // ifdef ARDUINO_ARCH_ESP32
+#endif      // ifndef TwoWireSlave_h

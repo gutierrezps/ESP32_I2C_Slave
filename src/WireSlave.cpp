@@ -5,7 +5,7 @@
  * @date 2020-06-16
  * 
  */
-
+#ifdef ARDUINO_ARCH_ESP32
 #include <Arduino.h>
 #include <driver/i2c.h>
 
@@ -198,3 +198,5 @@ void TwoWireSlave::onRequest(void (*function)(void))
 
 TwoWireSlave WireSlave = TwoWireSlave(0);
 TwoWireSlave WireSlave1 = TwoWireSlave(1);
+
+#endif      // ifdef ARDUINO_ARCH_ESP32
