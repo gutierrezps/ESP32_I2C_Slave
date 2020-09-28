@@ -121,6 +121,7 @@ longer be needed.
 
 * ESP IDF API for I2C slave: [I2C Driver][idf-api]
 * I2C example for ESP IDF API: [i2c_example_main.c][idf-i2c-example]
+* Raspberry Pi Master driver, by MkLHX: [Raspberry_Pi_Master_for_ESP32_I2C_SLAVE][rpi-master-driver]
 
 [issue-118-arduino]: https://github.com/espressif/arduino-esp32/issues/118
 [idf-api]: https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/i2c.html#communication-as-slave
@@ -128,6 +129,7 @@ longer be needed.
 [pr-2096-idf]: https://github.com/espressif/esp-idf/pull/2096
 [issue-3099-idf]: https://github.com/espressif/esp-idf/issues/3099
 [idf-i2c-example]: https://github.com/espressif/esp-idf/blob/master/examples/peripherals/i2c/i2c_self_test/main/i2c_example_main.c
+[rpi-master-driver]: https://github.com/MkLHX/Raspberry_Pi_Master_for_ESP32_I2C_SLAVE
 
 [receiver_example]: examples/slave_receiver/slave_receiver.ino
 [sender_example]: examples/slave_sender/slave_sender.ino
