@@ -104,7 +104,7 @@ size_t WireSlaveRequest::available()
 int WireSlaveRequest::read()
 {
     int value = -1;
-    if (lastStatus_ == PACKET_READ && rxIndex_ < rxLength_ && (rxIndex_ < UNPACKER_BUFFER_LENGTH)) {
+    if (lastStatus_ == PACKET_READ && rxIndex_ < rxLength_) {
         value = rxBuffer_[rxIndex_];
         ++rxIndex_;
     }
