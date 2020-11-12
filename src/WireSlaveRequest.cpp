@@ -68,7 +68,7 @@ bool WireSlaveRequest::request(uint8_t address)
 
     // copy payload bytes to rxBuffer
     rxIndex_ = 0;
-    while (unpacker.available()) {
+    while (unpacker.available() && (rxIndex_ < UNPACKER_BUFFER_LENGTH)) {
         rxBuffer_[rxIndex_] = unpacker.read();
         ++rxIndex_;
     }
