@@ -2,7 +2,7 @@
  * @file WireSlave.cpp
  * @author Gutierrez PS <https://github.com/gutierrezps>
  * @brief TWI/I2C slave library for ESP32 based on ESP-IDF slave API
- * @date 2020-06-16
+ * @date 2021-02-21
  *
  */
 #ifdef ARDUINO_ARCH_ESP32
@@ -70,11 +70,11 @@ bool TwoWireSlave::begin(int sda, int scl, int address)
 void TwoWireSlave::update()
 {
     uint8_t inputBuffer[I2C_BUFFER_LENGTH] = {0};
-    uint16_t inputLen = 0;
+    int16_t inputLen = 0;
 
     inputLen = i2c_slave_read_buffer(portNum, inputBuffer, I2C_BUFFER_LENGTH, 1);
 
-    if (inputLen == 0 || inputLen == uint16_t(-1)) {
+    if (inputLen <= 0) {
         // nothing received or error
         return;
     }
@@ -84,7 +84,7 @@ void TwoWireSlave::update()
         unpacker_.reset();
     }
 
-    unpacker_.write(inputBuffer, inputLen);
+    unpacker_.write(inputBuffer, size_t(inputLen));
 
     if (unpacker_.isPacketOpen() || unpacker_.totalLength() == 0) {
         // still waiting bytes,
