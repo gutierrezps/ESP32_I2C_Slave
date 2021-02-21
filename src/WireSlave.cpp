@@ -3,7 +3,7 @@
  * @author Gutierrez PS <https://github.com/gutierrezps>
  * @brief TWI/I2C slave library for ESP32 based on ESP-IDF slave API
  * @date 2020-06-16
- * 
+ *
  */
 #ifdef ARDUINO_ARCH_ESP32
 #include <Arduino.h>
@@ -26,7 +26,7 @@ TwoWireSlave::TwoWireSlave(uint8_t bus_num)
     ,packer_()
     ,unpacker_()
 {
-    
+
 }
 
 TwoWireSlave::~TwoWireSlave()
@@ -72,10 +72,10 @@ void TwoWireSlave::update()
     uint8_t inputBuffer[I2C_BUFFER_LENGTH] = {0};
     uint16_t inputLen = 0;
 
-    inputLen = i2c_slave_read_buffer(portNum, inputBuffer, I2C_BUFFER_LENGTH, 0);
-    
-    if (inputLen == 0) {
-        // nothing received
+    inputLen = i2c_slave_read_buffer(portNum, inputBuffer, I2C_BUFFER_LENGTH, 1);
+
+    if (inputLen == 0 || inputLen == uint16_t(-1)) {
+        // nothing received or error
         return;
     }
 
@@ -95,11 +95,11 @@ void TwoWireSlave::update()
     if (unpacker_.hasError()) {
         return;
     }
-    
+
     if (unpacker_.available()) {
         rxIndex = 0;
         rxLength = unpacker_.available();
-        
+
         // transfer bytes from packet to rxBuffer
         while (unpacker_.available()) {
             rxBuffer[rxIndex] = unpacker_.read();
@@ -112,8 +112,7 @@ void TwoWireSlave::update()
             user_onReceive(rxLength);
         }
     }
-
-    if (user_onRequest) {
+    else if (user_onRequest) {
         txIndex = 0;
         txLength = 0;
         packer_.reset();
@@ -125,7 +124,7 @@ void TwoWireSlave::update()
             ++txIndex;
         }
         txLength = txIndex;
-        
+
         i2c_reset_tx_fifo(portNum);
         i2c_slave_write_buffer(portNum, txBuffer, txLength, 0);
     }
