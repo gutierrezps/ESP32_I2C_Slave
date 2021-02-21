@@ -91,10 +91,8 @@ payload).
 
 On the slave side, the class `WireSlave` internally packs and unpacks the data
 using `WirePacker` and `WireUnpacker`, so `onReceive()` and `onRequest()`
-usages are **almost** the same. The only difference is that `onRequest()`
-is called whenever the master sends data, since there's no way to know
-when the master will request or is requesting data. Also note that
-**data that is not packet will be ignored by the slave**.
+usages are the same. Note that **data that is not packet will be ignored by**
+**the slave**.
 
 On the master side, `WirePacker` is available to pack the data before sending
 through `Wire`. Reading data is a little more tricky because of the data break

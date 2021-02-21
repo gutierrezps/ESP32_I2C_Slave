@@ -31,22 +31,21 @@ void setup()
     }
 
     WireSlave.onRequest(requestEvent);
+    Serial.printf("Slave joined I2C bus with addr #%d\n", I2C_SLAVE_ADDR);
 }
 
 void loop()
 {
     // the slave response time is directly related to how often
     // this update() method is called, so avoid using long delays
-    // inside loop()
+    // inside loop(), and be careful with time-consuming tasks
     WireSlave.update();
 
     // let I2C and other ESP32 peripherals interrupts work
     delay(1);
 }
 
-// function that executes whenever **a data packet is sent by master**,
-// since there's no way to know (at the moment) when master
-// will request or is requesting data.
+// function that runs whenever the master sends an empty packet.
 // this function is registered as an event, see setup().
 // do not perform time-consuming tasks inside this function,
 // do them elsewhere and simply read the data you wish to
@@ -54,7 +53,7 @@ void loop()
 void requestEvent()
 {
     static byte y = 0;
-    
+
     WireSlave.print("y is ");
     WireSlave.write(y++);
 }

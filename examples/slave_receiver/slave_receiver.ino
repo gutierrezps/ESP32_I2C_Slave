@@ -35,7 +35,7 @@ void loop()
 {
     // the slave response time is directly related to how often
     // this update() method is called, so avoid using long delays
-    // inside loop()
+    // inside loop(), and be careful with time-consuming tasks
     WireSlave.update();
 
     // let I2C and other ESP32 peripherals interrupts work
